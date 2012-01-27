@@ -272,7 +272,7 @@ int tokenLength;
 int line_no = 1;
 
 /*----------------------------------------------------------*/
-void skipSpace() {/*this used to be an int-fcn, but it returned nothing!*/
+void skipSpace() {/*this used to be an int-returning fcn, but it returned nothing!*/
 	char c;
 
 	c = getchar();
@@ -285,7 +285,6 @@ void skipSpace() {/*this used to be an int-fcn, but it returned nothing!*/
 	/*return character to input buffer if eof is not reached*/
 	if (!feof(stdin))
 		ungetc(c, stdin);
-	 /*todo should this return something??  it used to be an int- function??*/
 }
 
 int isKeyword(char *s) {
@@ -315,7 +314,7 @@ int scan_number() {
 			while (isdigit(c)) {
 				token[tokenLength] = c;
 				tokenLength++;
-				;
+				;/* TODO why is there a semicolon here??*/
 				c = getchar();
 			}
 			ungetc(c, stdin);
@@ -329,16 +328,41 @@ int scan_number() {
 			if (isdigit(c)) {
 				token[tokenLength] = '.';
 				tokenLength++;
-				while (isdigit(c)) {
+				do{/* no need to check if isdigit(c) again, it was just confirmed */
 					token[tokenLength] = c;
 					tokenLength++;
 					c = getchar();
+				}while (isdigit(c));
+
+				if (c == 'E' || c == 'e') {/* check for SCINUM*/
+					token[tokenLength] = c;
+					tokenLength++;
+					c = getchar();
+
+					if(c == '+' || c == '-'){
+						token[tokenLength] = c;
+						tokenLength++;
+						c=getchar();
+					}
+					if(isdigit(c)){
+						do{// definitely a SCINUM
+							token[tokenLength] = c;
+							tokenLength++;
+							c=getchar();
+						}while(isdigit(c));
+
+						token[tokenLength] = '\0';
+						if (!feof(stdin))
+							ungetc(c, stdin);
+						return SCINUM;
+					}
 				}
 				token[tokenLength] = '\0';
 				if (!feof(stdin))
 					ungetc(c, stdin);
 				return REALNUM;
-			} else {
+			}
+			else {
 				ungetc(c, stdin); /*note that ungetc returns characters on a stack, so we first*/
 				c = '.'; /* return the second character and set c to '.' and return c again*/
 				ungetc(c, stdin);
@@ -405,26 +429,26 @@ int getToken()
 			ungetc(c, stdin);
 			return LESS;
 		}
-		/* Add code to handle LSHIFT - DONE*/
+/* Add code to handle LSHIFT - DONE*/
 	case '>':
 		c = getchar();
 		if (c == '=')
 			return GTEQ;
 		else if (c ==  '>')
-			return LSHIFT;
+			return RSHIFT;
 		else {
 			ungetc(c, stdin);
 			return GREATER;
 		}
-/*		// Add code to handle RSHIFT - DONE*/
+/*	Add code to handle RSHIFT - DONE*/
 
 	default:
 		if (isdigit(c)) {
 			ungetc(c, stdin);
 			return scan_number();
-		} else if (isalpha(c)) /* token is either keyword, ID or
-			FUNC_ID
-			Add code below to handle FUNC_ID*/
+		} else if (isalpha(c))
+			/* token is either keyword, ID or FUNC_ID
+			 * Add code below to handle FUNC_ID*/
 		{
 			while (isalnum(c)) {
 				token[tokenLength] = c;
@@ -432,6 +456,20 @@ int getToken()
 				c = getchar();
 			}
 			token[tokenLength] = '\0';
+
+			if (strcmp(token, "FUNC") == 0 )
+			{	/* func_id*/
+				c = getchar();
+				if(c=='_'){
+					// This may be a FUNC_ID
+					c=getchar();
+					if(isdigit(c))
+					{
+						ungetc(c, stdin);
+					}
+				}
+			}
+
 
 			ttype = isKeyword(token);
 			if (ttype == 0)
