@@ -1,171 +1,208 @@
 /* ----------------------------PROJECT DESCRIPTION -------------------------
-   In this project, you are asked to finish an INCOMPLETE lexical analyzer, 
-   certain parts are not coded and you should read the code and fill in the gaps.
-   I am going to start by describing the tokens. Then I will discuss some
-   difficulty in recognizing tokens that have overlapping prefixes. Then I 
-   will give you the requirements for the project.
+ In this project, you are asked to finish an INCOMPLETE lexical analyzer,
+ certain parts are not coded and you should read the code and fill in the gaps.
+ I am going to start by describing the tokens. Then I will discuss some
+ difficulty in recognizing tokens that have overlapping prefixes. Then I
+ will give you the requirements for the project.
 
-   It is very important that you read everything carefully. If you are in a
-   rush to finish the project, you cannot afford working fast! You should 
-   work deliberately and carefully.
+ It is very important that you read everything carefully. If you are in a
+ rush to finish the project, you cannot afford working fast! You should
+ work deliberately and carefully.
 
-   Note: the lexical analyzer provided executes and produces output, but it
-   is not always correct output. After you add your code, it shoudl produce
-   the correct output in all cases.
- 
-   ALPHABET
+ Note: the lexical analyzer provided executes and produces output, but it
+ is not always correct output. After you add your code, it should produce
+ the correct output in all cases.
 
-   the alphabet is
-                    {0 , 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                     a , b , c , ... , z ,
-                     A , B, C , ... , Z ,
-                     < , > , = , + , - , _ , * , / , 
-                     ( , ) , [ , ] , 
-                     ',' , :  , ; , . }
+ ALPHABET
 
-   TOKENS
+ the alphabet is
+ {0 , 1, 2, 3, 4, 5, 6, 7, 8, 9,
+ a , b , c , ... , z ,
+ A , B, C , ... , Z ,
+ < , > , = , + , - , _ , * , / ,
+ ( , ) , [ , ] ,
+ ',' , :  , ; , . }
 
-   The tokens are
+ TOKENS
 
-                    VAR        = (V)(A)(R)
-                    BEGIN      = (B)(E)(G)(I)(N)
-                    END        = (E)(N)(D)
-                    ASSIGN     = (A)(S)(S)(I)(G)(N)
-                    IF         = (I)(F)
-                    WHILE      = (W)(H)(I)(L)(E)
-                    DO         = (D)(O)
-                    THEN       = (T)(H)(E)(N)
-                    PRINT      = (P)(R)(I)(N)(T)
-                    INT        = (I)(N)(T)
-                    REAL       = (R)(E)(A)(L)
-                    STRING     = (S)(T)(R)(I)(N)(G)
-                    PLUS       = '+'
-                    MINUS      =  -
-					UNDERSCORE =  _
-                    DIV        =  / 
-                    MULT       =  *
-                    EQUAL      = '='
-                    COLON      =  :
-                    COMMA      =  ,
-                    SEMICOLON  =  ;
-                    LBRAC      =  [
-                    RBRAC      =  ]
-                    LPAREN     =  '('
-                    RPAREN     =  ')'
-                    NOTEQUAL   =  <>
-                    GREATER    =  >
-                    LESS       =  <
-                    LTEQ       =  <=
-                    GTEQ       =  >=
-                    LSHIFT     =  <<
-                    RSHIFT     =  >>
-                    DOT        =  '.'
-                    NUM        =  pdigit digit* + 0
-                    REALNUM    =  NUM DOT digit digit*
-                    ID         =  letter (letter+digit)*
-                    FUNCID     =  (F)(U)(N)(C)(_) ID
-                    SCINUM     =  REALNUM (E+e) ('+' + '-')NUM
+ The tokens are
 
-                    where 
-                          pdigit = 1+2+3+4+5+6+7+8+9
-                          digit  = 0+1+2+3+4+5+6+7+8+9
-                          letter = a+b+...+z+A+B+...+Z
- 
-Note that 0.00 is allowed as REALNUM, but 00.1 is not allowed
-Also, note that token definitions are case-sensitive. So, "while" is not 
-a WHILE token.
-Finally, I am using ' ' to distinguish between alphabet synbols and meta
-symbols. For example, parentheses are used both as alphabet symbols or as
-part of the definition of regular expressions. 
+ VAR        = (V)(A)(R)
+ BEGIN      = (B)(E)(G)(I)(N)
+ END        = (E)(N)(D)
+ ASSIGN     = (A)(S)(S)(I)(G)(N)
+ IF         = (I)(F)
+ WHILE      = (W)(H)(I)(L)(E)
+ DO         = (D)(O)
+ THEN       = (T)(H)(E)(N)
+ PRINT      = (P)(R)(I)(N)(T)
+ INT        = (I)(N)(T)
+ REAL       = (R)(E)(A)(L)
+ STRING     = (S)(T)(R)(I)(N)(G)
+ PLUS       = '+'
+ MINUS      =  -
+ UNDERSCORE =  _
+ DIV        =  /
+ MULT       =  *
+ EQUAL      = '='
+ COLON      =  :
+ COMMA      =  ,
+ SEMICOLON  =  ;
+ LBRAC      =  [
+ RBRAC      =  ]
+ LPAREN     =  '('
+ RPAREN     =  ')'
+ NOTEQUAL   =  <>
+ GREATER    =  >
+ LESS       =  <
+ LTEQ       =  <=
+ GTEQ       =  >=
+ LSHIFT     =  <<
+ RSHIFT     =  >>
+ DOT        =  '.'
+ NUM        =  pdigit digit* + 0
+ REALNUM    =  NUM DOT digit digit*
+ ID         =  letter (letter+digit)*
+ FUNCID     =  (F)(U)(N)(C)(_) ID
+ SCINUM     =  REALNUM (E+e) ('+' + '-')NUM
 
-LEXICAL ANALYSIS AND ITS COMPLICATIONS
-The main function of lexical analysis is to identify the next token in the input. In the program you are given, the functions that does that is the getToken() function. If there is more than one possibility, we look for the longest possible token. For example, if the input is "FUNC_A1", we do not return two tokens "FUNC"
-as an ID token because "FUNC_A1" is a FUNCID and  222 for example and is 
-the longest possible token starting at the beginning of the input.
+ where
+ pdigit = 1+2+3+4+5+6+7+8+9
+ digit  = 0+1+2+3+4+5+6+7+8+9
+ letter = a+b+...+z+A+B+...+Z
 
-Reading the input is done using a function that reads the next character. In C, getchar() is such a function.
+ Note that 0.00 is allowed as REALNUM, but 00.1 is not allowed
+ Also, note that token definitions are case-sensitive. So, "while" is not
+ a WHILE token.
+ Finally, I am using ' ' to distinguish between alphabet synbols and meta
+ symbols. For example, parentheses are used both as alphabet symbols or as
+ part of the definition of regular expressions.
 
-Identifying the longest token is not not always straightforward. For example, consider the input
+ LEXICAL ANALYSIS AND ITS COMPLICATIONS
+ The main function of lexical analysis is to identify the next token in the input.
+ In the program you are given, the functions that does that is the getToken() function.
+ If there is more than one possibility, we look for the longest possible token.
+ For example, if the input is "FUNC_A1", we do not return two tokens "FUNC"
+ as an ID token because "FUNC_A1" is a FUNCID and  222 for example and is
+ the longest possible token starting at the beginning of the input.
 
-              111.a
+ Reading the input is done using a function that reads the next character. In C, getchar() is such a function.
 
-As we start reading the digits, we know that we are looking either for NUM
-or for a REALNUM. When '.' is read, we think that there might still be a chance
-that a REALNUM will be identified. When the 'a' is read, we realize that we should
-identify 111 as a NUM and '.' as a DOT.
+ Identifying the longest token is not not always straightforward. For example, consider the input
 
-In general, this might require backtracking multiple characters (alphabet symbols). In the language we are considering, we need to backtrack at most 2 characters. One way to achieve that in the case of REALNUM is to keep track of every position in which we have identified a "maximal" token (a token that cannot be extended further). For example, in the example above, 111 is a maximal NUM token because for the given input it cannot be extended further into a longer NUM token. The token returned is the longest maximal token. If the input were
+ 111.a
 
-      111.1
+ As we start reading the digits, we know that we are looking either for NUM
+ or for a REALNUM. When '.' is read, we think that there might still be a chance
+ that a REALNUM will be identified. When the 'a' is read, we realize that we should
+ identify 111 as a NUM and '.' as a DOT.
 
-then both 111 and 111.1 are maximal tokens and we choose the longer between the two.
-Note that the ungetc() function can be called multiple times, but characters that are ungot are available for reading operations in the reverse order they were put back into the stream.
+ In general, this might require backtracking multiple characters (alphabet symbols).
+ In the language we are considering, we need to backtrack at most 2 characters.
+ One way to achieve that in the case of REALNUM is to keep track of every position in which
+ we have identified a "maximal" token (a token that cannot be extended further).
+ For example, in the example above, 111 is a maximal NUM token because for the given input
+ it cannot be extended further into a longer NUM token. The token returned is the longest
+ maximal token. If the input were
 
-So, if you execute 
+ 111.1
 
-             ungetc('a',stdin); ungetc('b',stdin); 
-             x = getchar(); y = getchar();
+ then both 111 and 111.1 are maximal tokens and we choose the longer between the two.
+ Note that the ungetc() function can be called multiple times, but characters that are
+ ungot are available for reading operations in the reverse order they were put back into the stream.
 
-then x is 'b' and y is 'a'.
+ So, if you execute
 
-To simplify the identfication of tokens, we should have the cursor pointing
-to the next character after the token just identidied. For example, for the input "111+", we need to read the '+' to determine that the token is 111. Instead of keeping the '+' that we read in a variable of the lexical analyzer, we "return it" to the input stream so that next time we call getToken() it will read the '+'. A similar approach would work for REALNUM but the solution is a little more
-complicated because we need to return more than one character (see below). 
+ ungetc('a',stdin); ungetc('b',stdin);
+ x = getchar(); y = getchar();
 
-Another complication arises when the input exactly matches more than one token
-in which case the longest prefix matching rule does not help. 
-For example, "WHILE" is a WHILE token, but it also matches the format of ID (identifier). In this case, the practice is to identify (return) the token that appears first in the list of tokens. In our list WHILE appears before ID, so we identify "WHILE" as WHILE and not as ID.
-       
-REQUIREMENTS
+ then x is 'b' and y is 'a'.
 
-You are asked to finish the getToken() and associated functions to identify all tokens defined above. The output of the program is a list of tokens and the line numbers in which they appear. For ID, FUNCID, NUM, REALNUM and SCINUM the actual token string should be printed.
+ To simplify the identfication of tokens, we should have the cursor pointing
+ to the next character after the token just identidied. For example, for the input "111+",
+ we need to read the '+' to determine that the token is 111. Instead of keeping the '+' that
+ we read in a variable of the lexical analyzer, we "return it" to the input stream so that next
+ time we call getToken() it will read the '+'. A similar approach would work for REALNUM but the
+ solution is a little more complicated because we need to return more than one character (see below).
 
-Your program will read the input from standard input (you do not need to modify how characters are read). To read input from a file, you can simply execute the 
-following from the command prompt
+ Another complication arises when the input exactly matches more than one token
+ in which case the longest prefix matching rule does not help.
+ For example, "WHILE" is a WHILE token, but it also matches the format of ID (identifier).
+ In this case, the practice is to identify (return) the token that appears first in the list of tokens.
+ In our list WHILE appears before ID, so we identify "WHILE" as WHILE and not as ID.
 
-        ./a.out <filein >fileout
+ REQUIREMENTS
 
-This will execute the program and treats filein as standard output and fileout as standard output. So, instead of diplaying output on the terminal, it will simply write it to file fileout.
+ You are asked to
 
-You should run and test you program on the general machines. To login to general, you can execute "ssh username@general.asu.edu" from a command prompt 
-(where username is your asurite user name) or run the ssh program and connect 
-to general. 
+ finish the getToken() and associated functions to identify all tokens defined above.
+ The output of the program is a list of tokens and the line numbers in which they appear.
+ For ID, FUNCID, NUM, REALNUM and SCINUM the actual token string should be printed.
 
-To compile your program, you execute 
+ Your program will read the input from standard input (you do not need to modify how characters are read).
+ To read input from a file, you can simply execute the
+ following from the command prompt
 
+ ./a.out <filein >fileout
 
-       gcc scanner.c 
+ This will execute the program and treats filein as standard input and fileout as standard output.
+ So, instead of displaying output on the terminal, it will simply write it to file fileout.
 
-from the command prompt. 
+ You should run and test you program on the general machines. To login to general, you can execute
+ "ssh username@general.asu.edu" from a command prompt
+ (where username is your asurite user name) or run the ssh program and connect
+ to general.
 
-To test your program, I provide you with a set of test cases and the expected output for these cases. Your program will be tested on these cases and some other cases. 
+ To compile your program, you execute
+ gcc scanner.c
 
-To automate testing your program on the many cases, I provided you with a shell script that will automatically run your program on all the test cases and compares your programs output with the expected output. If they match, it reports success, otherwise, it reports failures and shows where the expected and produced outputs differ. The script expects that your executable name is a.out and that the test cases are in a directory called tests. The script file, the executable and the tests directory should all be in the same directory for testing. In other words, if your project directory is project2, then a.out, test1.sh and tests are all in the directory project2. To execute the script, simply type
+ from the command prompt.
 
-      ./test1.sh
+ To test your program, I provide you with a set of test cases and the expected output for these cases.
+ Your program will be tested on these cases and some other cases.
 
-from the command prompt. If it complains about test1.sh having no permission, execute
+ To automate testing your program on the many cases, I provided you with a shell script that will
+ automatically run your program on all the test cases and compares your programs output with the
+ expected output. If they match, it reports success, otherwise, it reports failures and shows where
+ the expected and produced outputs differ. The script expects that your executable name is a.out and
+ that the test cases are in a directory called tests. The script file, the executable and the tests
+ directory should all be in the same directory for testing. In other words, if your project
+ directory is project2, then a.out, test1.sh and tests are all in the directory project2.
+ To execute the script, simply type
 
-      chmod 700 test1.sh
+ ./test1.sh
 
-from the command prompt. You only need to execute chmod once (if you are interested to know, chmod changes the file permission to be executable).
+ from the command prompt. If it complains about test1.sh having no permission, execute
 
-The result of executing test1.sh is a list of all the files that pass the tests and those that do not pass with a comparison between expected output and output of your code. At the end, there is a number. This is the number of the test cases that pass. 
+ chmod 700 test1.sh
 
-IMPORTANT
+ from the command prompt. You only need to execute chmod once (if you are interested to know,
+ chmod changes the file permission to be executable).
 
-read the syllabus for instructions on how to name your files. This is 
-very important.
+ The result of executing test1.sh is a list of all the files that pass the tests and those that
+ do not pass with a comparison between expected output and output of your code. At the end, there is a number.
+ This is the number of the test cases that pass.
 
-Also, please read the syllabus on grading of programmming assignments.
-----------------------------------------------------------------------------*/
+ IMPORTANT
+
+ read the syllabus for instructions on how to name your files. This is very important.
+
+ Also, please read the syllabus on grading of programmming assignments.
+ ----------------------------------------------------------------------------*/
+/* TODO name turn in based on rules from Syllabus*/
+/* TODO test on general.asu.edu*/
+
+/* TODO START HERE read the entire source file */
 
 #include <stdio.h>
+#include <ctype.h> 	/* isspace(), isdigit(), isalpha(), isalnum() */
+#include <string.h> /* strcmp() */
+
 
 #define TRUE 1
 #define FALSE 0
 
-//----------------------------- token types ------------------------------
+/* ----------------------------- token types ------------------------------ */
 #define KEYWORDS 12
 #define RESERVED 39
 #define VAR 1
@@ -208,263 +245,232 @@ Also, please read the syllabus on grading of programmming assignments.
 #define SCINUM 38
 #define ERROR 39
 
-//------------------- reserved words and token strings -----------------------
-char *reserved[] = 
-	{	"",
-		"VAR", 
-		"BEGIN", 
-		"END", 
-		"ASSIGN", 
-		"IF", 
-		"WHILE", 
-		"DO", 
-		"THEN", 
-		"PRINT", 
-        "INT",
-		"REAL",
-		"STRING",
-		"+",
-		"-",
-		"_", 
-		"/", 
-		"*", 
-		"=", 
-		":", 
-		",", 
-		";", 
-		"[", 
-		"]", 
-		"(", 
-		")", 
-		"<>", 
-		">", 
-		"<",
-		"<=",
-		">=",
-		"<<",
-		">>",
-		".",
-        "ID",
-        "NUM",
-        "REALNUM",
-		"FUNCID",
-		"SCINUM",
-		"ERROR"
-		};
+/*------------------- reserved words and token strings -----------------------*/
+char *reserved[] = { "", "VAR", "BEGIN", "END", "ASSIGN", "IF", "WHILE", "DO",
+		"THEN", "PRINT", "INT", "REAL", "STRING", "+", "-", "_", "/", "*", "=",
+		":", ",", ";", "[", "]", "(", ")", "<>", ">", "<", "<=", ">=", "<<",
+		">>", ".", "ID", "NUM", "REALNUM", "FUNCID", "SCINUM", "ERROR" };
 
-int printToken(int ttype)
-{
-   if (ttype <= RESERVED)
-   {   printf("%s\n",reserved[ttype]);
-       return 1;
-   } else
-       return 0; 
+int printToken(int ttype) {
+	if (ttype <= RESERVED) {
+		printf("%s\n", reserved[ttype]);
+		return 1;
+	} else
+		return 0;
 }
-//---------------------------------------------------------
+/*--------------------------------------------------------- */
 
-//---------------------------------------------------------
-// Global Variables associated with the next input token
+/*---------------------------------------------------------*/
+/* Global Variables associated with the next input token*/
 #define MAX_TOKEN_LENGTH 100
 
-char token[MAX_TOKEN_LENGTH];     // token string
-int  ttype;                        // token type
-                
-int  tokenLength;
+char token[MAX_TOKEN_LENGTH]; /* token string*/
+int ttype; /* token type*/
 
+int tokenLength;
 
 int line_no = 1;
 
-//----------------------------------------------------------
-int skipSpace()
-{
-   char c;
-
-   c = getchar(); 
-   line_no += (c == '\n');
-   while (!feof(stdin) && isspace(c))
-   {    c = getchar(); 
-        line_no += (c == '\n');
-   }
-
-   // return character to input buffer if eof is not reached
-   if (!feof(stdin)) 
-        ungetc(c,stdin);
-}
-
-int isKeyword(char *s)
-{
-     int i;
-
-     for (i = 1; i <= KEYWORDS; i++)
-	if (strcmp(reserved[i],s) == 0)
-	   return i;
-     return FALSE;
-}
-
-int scan_number()
-{
-	// This function does not take SCINUM into account!
-	// You should consider adding functionality for SCINUM
-	
+/*----------------------------------------------------------*/
+void skipSpace() {/*this used to be an int-fcn, but it returned nothing!*/
 	char c;
-	
+
 	c = getchar();
-	if (isdigit(c))
-	{	// First collect leading digits before dot
-		// 0 is a nNUM by itself
-		if (c == '0')	      
-		{	token[tokenLength] = c;
+	line_no += (c == '\n');
+	while (!feof(stdin) && isspace(c)) {
+		c = getchar();
+		line_no += (c == '\n');
+	}
+
+	/*return character to input buffer if eof is not reached*/
+	if (!feof(stdin))
+		ungetc(c, stdin);
+	 /*todo should this return something??  it used to be an int- function??*/
+}
+
+int isKeyword(char *s) {
+	int i;
+
+	for (i = 1; i <= KEYWORDS; i++)
+		if (strcmp(reserved[i], s) == 0)
+			return i;
+	return FALSE;
+}
+
+/* TODO add functionality for scan_number(), enable SCINUM */
+int scan_number() {
+/* This function does not take SCINUM into account!*/
+/* You should consider adding functionality for SCINUM*/
+
+	char c;
+
+	c = getchar();
+	if (isdigit(c)) { /*First collect leading digits before dot*/
+		/* 0 is a nNUM by itself*/
+		if (c == '0') {
+			token[tokenLength] = c;
 			tokenLength++;
 			token[tokenLength] = '\0';
-		} else
-		{	while (isdigit(c))
-			{	token[tokenLength] = c;
-				tokenLength++;;
+		} else {
+			while (isdigit(c)) {
+				token[tokenLength] = c;
+				tokenLength++;
+				;
 				c = getchar();
 			}
-			ungetc(c,stdin);
+			ungetc(c, stdin);
 			token[tokenLength] = '\0';
 		}
 
-		// Check if leading digits are integer part of a REALNUM
+		 /*Check if leading digits are integer part of a REALNUM*/
 		c = getchar();
-		if (c == '.')
-		{	c = getchar();
-			if (isdigit(c))
-			{	token[tokenLength] = '.';
+		if (c == '.') {
+			c = getchar();
+			if (isdigit(c)) {
+				token[tokenLength] = '.';
 				tokenLength++;
-				while (isdigit(c))
-				{	token[tokenLength] = c;
+				while (isdigit(c)) {
+					token[tokenLength] = c;
 					tokenLength++;
 					c = getchar();
 				}
 				token[tokenLength] = '\0';
-				if (!feof(stdin)) 
-					ungetc(c,stdin);
+				if (!feof(stdin))
+					ungetc(c, stdin);
 				return REALNUM;
-			} else
-			{	ungetc(c, stdin);    // note that ungetc returns characters on a stack, so we first
-				c = '.';             // return the second character and set c to '.' and return c again
-				ungetc(c,stdin);				                                 
-				return  NUM;         
-                        }
-		} else
-		{	ungetc(c, stdin);
+			} else {
+				ungetc(c, stdin); /*note that ungetc returns characters on a stack, so we first*/
+				c = '.'; /* return the second character and set c to '.' and return c again*/
+				ungetc(c, stdin);
+				return NUM;
+			}
+		} else {
+			ungetc(c, stdin);
 			return NUM;
 		}
 	} else
-		return ERROR;   
+		return ERROR;
 }
 
+/* TODO complete getToken() to accept all defined tokens */
 int getToken()
 {
-   char c;
-   int ttype;
+	char c;
+	int ttype;
 
-   
-       skipSpace();
-      
-       tokenLength = 0;
+	skipSpace();
 
-       c = getchar();
-        
-       switch (c)
-       {   case '.': return DOT;
-           case '+': return PLUS;
-           case '-': return MINUS;
-		   case '_': return UNDERSCORE;
-           case '/': return DIV;
-           case '*': return MULT;
-           case '=': return EQUAL;
-           case ':': return COLON;
-           case ',': return COMMA;
-           case ';': return SEMICOLON;
-           case '[': return LBRAC;
-           case ']': return RBRAC;
-           case '(': return LPAREN;
-           case ')': return RPAREN;
-           case '<':
-                      c = getchar();
-                       if (c == '=')
-                          return LTEQ;
-                       else
-                       if (c == '>')
-                          return NOTEQUAL;
-                       else
-                       {
-                          ungetc(c,stdin);
-                          return LESS;
-                       }
-		       // Add code to handle LSHIFT
-           case '>': 
-                        c = getchar();
-                        if (c == '=')
-                           return GTEQ;
-                        else
-                        {
-                           ungetc(c, stdin);
-                           return GREATER;
-                        }
-                        // Add code to handle RSHIFT
-           
-           default :
-			if (isdigit(c))
-			{	ungetc(c,stdin);
-				return scan_number();
+	tokenLength = 0;
+
+	c = getchar();
+
+	switch (c) {
+	case '.':
+		return DOT;
+	case '+':
+		return PLUS;
+	case '-':
+		return MINUS;
+	case '_':
+		return UNDERSCORE;
+	case '/':
+		return DIV;
+	case '*':
+		return MULT;
+	case '=':
+		return EQUAL;
+	case ':':
+		return COLON;
+	case ',':
+		return COMMA;
+	case ';':
+		return SEMICOLON;
+	case '[':
+		return LBRAC;
+	case ']':
+		return RBRAC;
+	case '(':
+		return LPAREN;
+	case ')':
+		return RPAREN;
+	case '<':
+		c = getchar();
+		if (c == '=')
+			return LTEQ;
+		else if (c == '>')
+			return NOTEQUAL;
+		else if (c ==  '<')
+			return LSHIFT;
+		else {
+			ungetc(c, stdin);
+			return LESS;
+		}
+		/* Add code to handle LSHIFT - DONE*/
+	case '>':
+		c = getchar();
+		if (c == '=')
+			return GTEQ;
+		else if (c ==  '>')
+			return LSHIFT;
+		else {
+			ungetc(c, stdin);
+			return GREATER;
+		}
+/*		// Add code to handle RSHIFT - DONE*/
+
+	default:
+		if (isdigit(c)) {
+			ungetc(c, stdin);
+			return scan_number();
+		} else if (isalpha(c)) /* token is either keyword, ID or
+			FUNC_ID
+			Add code below to handle FUNC_ID*/
+		{
+			while (isalnum(c)) {
+				token[tokenLength] = c;
+				tokenLength++;
+				c = getchar();
 			}
-			else
-                       if (isalpha(c)) // token is either keyword, ID or
-                                       // FUNC_ID
-                                       // Add code below to handle FUNC_ID
-                       {
-                          while (isalnum(c))
-                          { token[tokenLength] = c;
-                            tokenLength++;
-                            c = getchar();
-                          }
-                          token[tokenLength] = '\0';
-                           
-                          ttype = isKeyword(token);
-                          if (ttype == 0) 
-                               ttype = ID;
-                         
-                       } else
-                       if (c == EOF)
-                            return EOF;
-                       else
-                            return ERROR;
-            
-                       // this point is reached only if token is:
-                       //   - NUM
-                       //   - RESERVED, or
-                       //   - ID
-                       //   - ...
-                       // c is the last character read past the token
-                       token[tokenLength] = '\0';
-                       if (!feof(stdin)) 
-                           ungetc(c,stdin);
+			token[tokenLength] = '\0';
 
-                       return ttype;
-                   
-       }      
-   
+			ttype = isKeyword(token);
+			if (ttype == 0)
+				ttype = ID;
+
+		} else if (c == EOF)
+			return EOF;
+		else
+			return ERROR;
+
+		/* this point is reached only if token is:
+		     - NUM
+		     - RESERVED, or
+		     - ID
+		     - ...
+		   c is the last character read past the token*/
+		token[tokenLength] = '\0';
+		if (!feof(stdin))
+			ungetc(c, stdin);
+
+		return ttype;
+
+	}
+
 }
 
+int main() {
+	int ttype;
 
-main()
-{
-       int ttype;
-
-       
-       ttype = getToken();
-       while (ttype != EOF)
-       {   printf("%d ",line_no);
-           if ((ttype == NUM) | (ttype == ID) | (ttype == REALNUM) | (ttype == SCINUM) | (ttype == FUNCID))
-               printf("%s \n", token);
-           else 
-               printToken(ttype);
-            ttype = getToken();
-       }     
-
+	ttype = getToken();
+	while (ttype != EOF) {
+		printf("%d ", line_no);
+		if ((ttype == NUM) | (ttype == ID) | (ttype == REALNUM) | (ttype
+				== SCINUM) | (ttype == FUNCID))
+			printf("%s \n", token);
+		else
+			printToken(ttype);
+		ttype = getToken();
+	}
+	return 0;
 }
 
