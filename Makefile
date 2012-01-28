@@ -1,4 +1,4 @@
-a.out: scanner.o
+scanner: scanner.o
 	gcc -o a.out scanner.o
 
 scanner.o: scanner.c
@@ -15,7 +15,7 @@ DEBUG_FLAGS = -g3 -ggdb -O0 -Wall -pedantic -DDEBUG
 CONFIG		= -Wall -pedantic
 
 debug: CONFIG=$(DEBUG_FLAGS)
-debug: scan
+debug: scanner
 
 test: a.out test1.sh
 	./test1.sh

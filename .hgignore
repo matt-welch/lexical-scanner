@@ -1,8 +1,13 @@
 # use glob syntax
 syntax: glob
 
+*~
 *.zip
 .cproject
 .project
 __MACOSX*
-
+*Debug*
+*debug*
+tokenlist.txt
+*diff
+*output

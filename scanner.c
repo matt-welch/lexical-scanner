@@ -345,7 +345,7 @@ int scan_number() {
 						c=getchar();
 					}
 					if(isdigit(c)){
-						do{// definitely a SCINUM
+						do{/* definitely a SCINUM */
 							token[tokenLength] = c;
 							tokenLength++;
 							c=getchar();
@@ -380,11 +380,14 @@ int scan_number() {
 int getToken()
 {
 	char c;
-	int ttype;
+	int ttype, i;
 
 	skipSpace();
 
 	tokenLength = 0;
+	for(i = 0;i < MAX_TOKEN_LENGTH; ++i){
+		token[i]='\0';
+	}
 
 	c = getchar();
 
@@ -455,21 +458,38 @@ int getToken()
 				tokenLength++;
 				c = getchar();
 			}
-			token[tokenLength] = '\0';
 
+			/*----------------------------------------------------------------------*/
+			/*Check for FUNC_ID*/
 			if (strcmp(token, "FUNC") == 0 )
-			{	/* func_id*/
-				c = getchar();
+			{	/* It's definitely FUNC-something...*/
 				if(c=='_'){
-					// This may be a FUNC_ID
+					/* This may be a FUNC_ID if it's followed by a valid identifier  */
 					c=getchar();
 					if(isdigit(c))
-					{
+					{/* this is not a valid identifier (it's numeric) */
+						ungetc(c, stdin); /*return the character to stdin*/
+						c = '_'; 	/* put underscore back: set c to '_' and return c again*/
 						ungetc(c, stdin);
+						token[tokenLength] = '\0';
+						return ID;
+					}else if(isalpha(c)){/* this is a valid ID*/
+						token[tokenLength] = '_';
+						tokenLength++;
+
+						do{/* fetch the rest of the alphanumeric chars in ID*/
+							token[tokenLength] = c;
+							tokenLength++;
+							c = getchar();
+						}while (isalnum(c));
+						if (!feof(stdin))
+							ungetc(c, stdin);
+						return FUNCID;
 					}
 				}
 			}
-
+			/*----------------------------------------------------------------------*/
+			token[tokenLength] = '\0';
 
 			ttype = isKeyword(token);
 			if (ttype == 0)
