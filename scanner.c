@@ -384,10 +384,11 @@ int getToken()
 
 	skipSpace();
 
-	tokenLength = 0;
-	for(i = 0;i < MAX_TOKEN_LENGTH; ++i){
+	/* "Erase" up to size of the last token */
+	for(i = 0;i < tokenLength; ++i){
 		token[i]='\0';
 	}
+	tokenLength = 0;
 
 	c = getchar();
 
