@@ -17,5 +17,5 @@ CONFIG		= -Wall -pedantic
 debug: CONFIG=$(DEBUG_FLAGS)
 debug: scanner
 
-test: a.out test1.sh
+test: debug test1.sh
 	./test1.sh
