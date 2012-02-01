@@ -302,6 +302,7 @@ int scan_number() {
 /* You should consider adding functionality for SCINUM*/
 
 	char c;
+	char expChar;
 
 	c = getchar();
 	if (isdigit(c)) { /*First collect leading digits before dot*/
@@ -335,27 +336,41 @@ int scan_number() {
 				}while (isdigit(c));
 
 				if (c == 'E' || c == 'e') {/* check for SCINUM*/
-					token[tokenLength] = c;
-					tokenLength++;
+					expChar = c;
 					c = getchar();
-
+					
 					if(c == '+' || c == '-'){
+						token[tokenLength] = expChar;
+						tokenLength++;
+
 						token[tokenLength] = c;
 						tokenLength++;
 						c=getchar();
-					}
-					if(isdigit(c)){
-						do{/* definitely a SCINUM */
-							token[tokenLength] = c;
-							tokenLength++;
-							c=getchar();
-						}while(isdigit(c));
 
-						token[tokenLength] = '\0';
-						if (!feof(stdin))
+						if(isdigit(c)){
+							/* definitely a SCINUM */
+							do{
+								token[tokenLength] = c;
+								tokenLength++;
+								c=getchar();
+							}while(isdigit(c));
+
+							token[tokenLength] = '\0';
+							if (!feof(stdin))
+								ungetc(c, stdin);
+							return SCINUM;
+						}
+					}else{
+						/*return here for lack of +/- symbol*/ 
+						/*need to return E/e to stack here*/
+						if(!feof(stdin)){
 							ungetc(c, stdin);
-						return SCINUM;
+							ungetc(expChar, stdin);	/* put E|e back */
+						}
+						token[tokenLength] = '\0';
+						return REALNUM;
 					}
+
 				}
 				token[tokenLength] = '\0';
 				if (!feof(stdin))
@@ -453,6 +468,7 @@ int getToken()
 		} else if (isalpha(c))
 			/* token is either keyword, ID or FUNC_ID
 			 * Add code below to handle FUNC_ID*/
+	/*TODO make sure that order of tokens is preserved*/
 		{
 			while (isalnum(c)) {
 				token[tokenLength] = c;
