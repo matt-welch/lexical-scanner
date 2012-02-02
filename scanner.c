@@ -483,14 +483,7 @@ int getToken()
 				if(c=='_'){
 					/* This may be a FUNC_ID if it's followed by a valid identifier  */
 					c=getchar();
-					if(isdigit(c))
-					{/* this is not a valid identifier (it's numeric) */
-						ungetc(c, stdin); /*return the character to stdin*/
-						c = '_'; 	/* put underscore back: set c to '_' and return c again*/
-						ungetc(c, stdin);
-						token[tokenLength] = '\0';
-						return ID;
-					}else if(isalpha(c)){/* this is a valid ID*/
+					if(isalpha(c)){/* this is a valid ID*/
 						token[tokenLength] = '_';
 						tokenLength++;
 
@@ -502,6 +495,16 @@ int getToken()
 						if (!feof(stdin))
 							ungetc(c, stdin);
 						return FUNCID;
+					}
+					else
+					{/* this is not a valid identifier (it's not alpha) */
+						if (!feof(stdin)){
+							ungetc(c, stdin); /*return the character to stdin*/
+							c = '_'; 	/* put underscore back: set c to '_' and return c again*/
+							ungetc(c, stdin);
+						}
+						token[tokenLength] = '\0';
+						return ID;
 					}
 				}
 			}
